@@ -15,8 +15,7 @@
           - curl
           - gnupg
         state: present
-    # 🔐 ADD DOCKER REPOSITORY (IMPORTANT)
-# =========================
+    
     - name: Add Docker GPG key
       apt_key:
       url: https://download.docker.com/linux/ubuntu/gpg
@@ -47,7 +46,7 @@
 
     - name: Test Docker installation
       command: docker run hello-world
-    # 🔹 Nginx installation
+  
     - name: Installer Nginx
       apt:
             name: nginx
