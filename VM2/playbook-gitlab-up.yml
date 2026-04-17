@@ -3,6 +3,12 @@
   become: true
 
   tasks:
+    - name: Create /home/****/app directory for docker-compose
+      file:
+        path: /home/kaoutarbendidi/app/
+        state: directory
+        mode: '0755'
+
     - name: Copy docker-compose file
       copy:
         src: docker-compose-gitlab.yml
