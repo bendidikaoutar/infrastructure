@@ -1,0 +1,7 @@
+- name: Stop Docker compose stack
+  hosts: devsecops
+  become: true
+
+  tasks:
+    - name: Bring down services
+      command: docker compose -f /home/kaoutarbendidi/app/docker-compose.yml down
