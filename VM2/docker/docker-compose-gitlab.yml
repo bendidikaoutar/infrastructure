@@ -1,0 +1,68 @@
+services:
+
+  # =========================
+  #        GITLAB CE
+  # =========================
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    hostname: localhost 
+    restart: always
+
+  #  environment:
+    #  GITLAB_OMNIBUS_CONFIG: |
+  #     external_url 'http://192.168.56.21:8080'
+       # gitlab_rails['gitlab_shell_ssh_port'] = 6022
+       # gitlab_rails['time_zone'] = 'Europe/Paris'
+      #  gitlab_rails['gitlab_signup_enabled'] = false
+
+    ports:
+      - "8080:80"
+      - "8443:443"
+      - "6022:22"
+
+    volumes:
+      - gitlab_config:/etc/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_data:/var/opt/gitlab
+    
+    shm_size:  "256m"
+
+    networks:
+      - gitlab_net
+
+
+  # =========================
+  #      GITLAB RUNNER
+  # =========================
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    restart: always
+
+    depends_on:
+      - gitlab
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - gitlab_runner_config:/etc/gitlab-runner
+
+    networks:
+      - gitlab_net
+
+
+# =========================
+#        VOLUMES
+# =========================
+volumes:
+  gitlab_config:
+  gitlab_logs:
+  gitlab_data:
+  gitlab_runner_config:
+
+
+# =========================
+#        NETWORK
+# =========================
+networks:
+  gitlab_net:

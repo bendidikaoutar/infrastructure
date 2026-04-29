@@ -1,20 +1,49 @@
-- name: Setup Docker on DevSecOps VM
+- name: Deploy GitLab Stack Securely
   hosts: devsecops
   become: true
 
+  vars:
+    app_dir: /opt/gitlab-stack
+
   tasks:
-    - name: Create /home/****/app directory for docker-compose
+
+    #  Vérifier Docker
+    - name: Check Docker installed
+      command: docker --version
+      register: docker_check
+      failed_when: docker_check.rc != 0
+      changed_when: false
+
+    #  Créer dossier sécurisé
+    - name: Create secure directory
       file:
-        path: /home/kaoutarbendidi/app/
+        path: "{{ app_dir }}"
         state: directory
-        mode: '0755'
+        mode: '0750'
 
-    - name: Copy docker-compose file
+    #  Copier docker  compose
+    - name: Copy docker compose
       copy:
-        src: docker-compose-gitlab.yml
-        dest: /home/kaoutarbendidi/app/docker-compose.yml
+        src: docker/docker-compose-gitlab.yml
+        dest: "{{ app_dir }}/docker-compose.yml"
+        mode: '0640'
 
-    - name: Run docker compose
+    #  Lancer stack (idempotent)
+    # - name: Deploy stack safely
+    #  community.docker.docker_compose_v2:
+    #    project_src: "{{ app_dir }}"
+    #    state: present
+    - name: Run Docker Compose
       command: docker compose up -d
       args:
-        chdir: /home/kaoutarbendidi/app
+        chdir: "{{ app_dir }}"
+
+    #  Attendre vrai démarrage GitLab
+    - name: Wait GitLab ready
+      uri:
+        url: "http://192.168.56.21:8080/users/sign_in"
+        status_code: 200
+      register: result
+      retries: 30
+      delay: 10
+      until: result.status == 200
