@@ -1,22 +1,35 @@
-- name: Setup Docker on DevSecOps VM
+- name: Deploy GitLab Stack Securely
   hosts: devsecops
   become: true
   vars:
     - app_dir: "{{ ansible_user_dir }}/app"
 
+  vars:
+    app_dir: /opt/gitlab-stack
+
   tasks:
-    - name: Create /home/****/app directory for docker-compose
+
+    #  Vérifier Docker
+    - name: Check Docker installed
+      command: docker --version
+      register: docker_check
+      failed_when: docker_check.rc != 0
+      changed_when: false
+
+    #  Créer dossier sécurisé
+    - name: Create secure directory
       file:
         path: "{{ app_dir }}"
         state: directory
-        mode: '0755'
+        mode: '0750'
 
-    - name: Copy docker-compose file
+    #  Copier docker  compose
+    - name: Copy docker compose
       copy:
         src: docker-compose-gitlab.yml
-        dest: "{{ app_dir }}/docker-compose.yml"
+        dest: /home/kaoutarbendidi/app/docker-compose.yml
 
     - name: Run docker compose
       command: docker compose up -d
       args:
-        chdir: "{{ app_dir }}"
+        chdir: /home/kaoutarbendidi/app

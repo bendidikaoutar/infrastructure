@@ -1,36 +1,39 @@
 services:
 
   # =========================
-  #         GITLAB CE
+  #        GITLAB CE
   # =========================
   gitlab:
     image: gitlab/gitlab-ce:latest
     container_name: gitlab
-    hostname: gitlab.local
+    hostname: localhost 
     restart: always
 
-    environment:
-      GITLAB_OMNIBUS_CONFIG: |
-        external_url 'http://100.83.228.54:8080'
-        gitlab_rails['gitlab_shell_ssh_port'] = 6022
-        gitlab_rails['time_zone'] = 'Europe/Paris'
-        nginx['enable'] = false
-        gitlab_rails['trusted_proxies'] = ['nginx_proxy_ip_or_subnet']
+  #  environment:
+    #  GITLAB_OMNIBUS_CONFIG: |
+  #     external_url 'http://192.168.56.21:8080'
+       # gitlab_rails['gitlab_shell_ssh_port'] = 6022
+       # gitlab_rails['time_zone'] = 'Europe/Paris'
+      #  gitlab_rails['gitlab_signup_enabled'] = false
 
     ports:
-      - "8080:80" # HTTP
-      - "6022:22" # SSH Git
+      - "8080:80"
+      - "8443:443"
+      - "6022:22"
 
     volumes:
       - gitlab_config:/etc/gitlab
       - gitlab_logs:/var/log/gitlab
       - gitlab_data:/var/opt/gitlab
+    
+    shm_size:  "256m"
 
     networks:
       - gitlab_net
 
+
   # =========================
-  #       GITLAB RUNNER
+  #      GITLAB RUNNER
   # =========================
   gitlab-runner:
     image: gitlab/gitlab-runner:latest
@@ -47,8 +50,9 @@ services:
     networks:
       - gitlab_net
 
+
 # =========================
-#         VOLUMES
+#        VOLUMES
 # =========================
 volumes:
   gitlab_config:
@@ -56,8 +60,14 @@ volumes:
   gitlab_data:
   gitlab_runner_config:
 
+<<<<<<< HEAD:VM2-TEST/docker-compose-gitlab.yml
 # =========================
 #          NETWORK
+=======
+
+# =========================
+#        NETWORK
+>>>>>>> 6b01cdf37f8e43a5335cb1dcbeab1acb4bd625f7:VM2-TEST/docker/docker-compose-gitlab.yml
 # =========================
 networks:
   gitlab_net:

@@ -1,0 +1,91 @@
+- name: Setup DevSecOps VM (Docker + Tools)
+  hosts: devsecops
+  become: true
+
+  tasks:
+
+    # ---------------------------
+    # UPDATE SYSTEM
+    # ---------------------------
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    # ---------------------------
+    # UTILITIES (as per architecture)
+    # ---------------------------
+    - name: Install basic utilities
+      apt:
+        name:
+          - git
+          - curl
+          - ca-certificates
+          - gnupg
+          - lsb-release
+          - openssh-client
+        state: present
+
+    # ---------------------------
+    # DOCKER INSTALLATION
+    # ---------------------------
+    - name: Create keyrings directory
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download Docker GPG key
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+    - name: Convert GPG key
+      command: >
+        gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        /etc/apt/keyrings/docker.asc
+      args:
+        creates: /etc/apt/keyrings/docker.gpg
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+    - name: Update apt cache after adding Docker repo
+      apt:
+        update_cache: yes
+
+    - name: Install Docker Engine + Compose
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+    - name: Enable and start Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+   # - name: Add user to docker group   #si je supprime ça il faut tape avant chaque commande sudo et  ça plus securisé 
+     # user:
+       # name: "{{ ansible_user }}"
+        #groups: docker
+        #append: yes 
+
+    - name: Verify Docker version 
+      command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Verify Docker Compose version
+      command: docker compose version
+      register: compose_version
+      changed_when: false      
+
+    - name: Display installed versions
+      debug:
+        msg:
+          - "Docker: {{ docker_version.stdout }}"
+          - "Docker Compose: {{ compose_version.stdout }}"
