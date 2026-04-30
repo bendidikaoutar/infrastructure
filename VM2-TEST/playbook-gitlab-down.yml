@@ -2,16 +2,9 @@
   hosts: devsecops
   become: true
   vars:
-    - app_dir : "{{ ansible_user_dir }}/app"
-
-  vars:
     app_dir: /opt/gitlab-stack
 
   tasks:
-<<<<<<< HEAD
-    - name: Bring down services
-      command: docker compose -f "{{ app_dir }}/docker-compose.yml" down
-=======
 
     - name: Check stack exists
       stat:
@@ -23,4 +16,3 @@
         project_src: "{{ app_dir }}"
         state: absent
       when: stack_file.stat.exists
->>>>>>> 6b01cdf37f8e43a5335cb1dcbeab1acb4bd625f7

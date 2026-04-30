@@ -38,6 +38,7 @@
       get_url:
         url: https://download.docker.com/linux/ubuntu/gpg
         dest: /etc/apt/keyrings/docker.asc
+
     - name: Convert GPG key
       command: >
         gpg --dearmor -o /etc/apt/keyrings/docker.gpg

@@ -1,4 +1,4 @@
-- name: Install terraform and tailscale
+- name: Install terraform
   hosts: localhost
   become: true
   vars:
