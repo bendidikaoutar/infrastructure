@@ -56,8 +56,8 @@ volumes:
   gitlab_data:
   gitlab_runner_config:
 
-    # =========================
-    #          NETWORK
-    # =========================
+# =========================
+#          NETWORK
+# =========================
 networks:
   gitlab_net:

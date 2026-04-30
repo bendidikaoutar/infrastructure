@@ -58,9 +58,9 @@
         enabled: yes
         state: started
 
-    - name: Add kaoutar**** to docker group
+    - name: Add current ansible user to docker group
       user:
-        name: kaoutarbendidi
+        name: "{{ ansible_user }}"
         groups: docker
         append: yes
 

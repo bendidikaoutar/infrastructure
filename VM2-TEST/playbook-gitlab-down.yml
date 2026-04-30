@@ -1,7 +1,9 @@
 - name: Stop Docker compose stack
   hosts: devsecops
   become: true
+  vars:
+    - app_dir : "{{ ansible_user_dir }}/app"
 
   tasks:
     - name: Bring down services
-      command: docker compose -f /home/kaoutarbendidi/app/docker-compose.yml down
+      command: docker compose -f "{{ app_dir }}/docker-compose.yml" down
