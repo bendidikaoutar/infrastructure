@@ -1,6 +1,8 @@
 - name: Setup Docker & K8s
   hosts: vm2_cloud
   become: true
+  vars:
+    k3s_version: "v1.30.3+k3s1"
 
   tasks:
 
@@ -78,3 +80,19 @@
         msg:
           - "Docker: {{ docker_version.stdout }}"
           - "Docker Compose: {{ compose_version.stdout }}"
+
+    - name: Install K3s
+      shell: curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -
+      args:
+        creates: /usr/local/bin/k3s
+
+    - name: Get K3s token (for agents - optional)
+      slurp:
+        src: /var/lib/rancher/k3s/server/node-token
+      register: k3s_token
+
+    - name: Set kubectl config locally (so your CD can use it)
+      fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: ./kubeconfig.yaml
+        flat: yes
