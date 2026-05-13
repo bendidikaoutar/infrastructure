@@ -1,0 +1,177 @@
+---
+- name: Setup Kubernetes on all nodes
+  hosts: all
+  become: yes
+  vars:
+    kubernetes_version: "1.28"
+    pod_network_cidr: "192.168.0.0/16"
+    calico_version: "v3.25.0"
+
+  tasks:
+
+    - name: Load kernel modules
+      copy:
+        dest: /etc/modules-load.d/containerd.conf
+        content: |
+          overlay
+          br_netfilter
+
+    - name: Modprobe overlay
+      modprobe:
+        name: overlay
+
+    - name: Modprobe br_netfilter
+      modprobe:
+        name: br_netfilter
+
+    - name: Configure sysctl for Kubernetes
+      copy:
+        dest: /etc/sysctl.d/99-kubernetes.conf
+        content: |
+          net.bridge.bridge-nf-call-iptables = 1
+          net.ipv4.ip_forward = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+
+    - name: Apply sysctl
+      command: sysctl --system
+
+    - name: Install containerd
+      apt:
+        name: containerd
+        update_cache: yes
+
+    - name: Generate containerd config
+      shell: containerd config default | tee /etc/containerd/config.toml
+      args:
+        creates: /etc/containerd/config.toml
+
+    - name: Enable SystemdCgroup
+      replace:
+        path: /etc/containerd/config.toml
+        regexp: 'SystemdCgroup = false'
+        replace: 'SystemdCgroup = true'
+
+    - name: Restart containerd
+      systemd:
+        name: containerd
+        state: restarted
+        enabled: yes
+
+    - name: Disable swap
+      command: swapoff -a
+
+    - name: Remove swap from fstab
+      lineinfile:
+        path: /etc/fstab
+        regexp: '.*swap.*'
+        state: absent
+
+    - name: Install dependencies
+      apt:
+        name: [apt-transport-https, ca-certificates, curl, gpg]
+        update_cache: yes
+
+    - name: Create keyrings directory
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+
+    - name: Add Kubernetes GPG key
+      shell: |
+        curl -fsSL https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/Release.key | \
+        gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      args:
+        creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+    - name: Add Kubernetes apt repo
+      copy:
+        dest: /etc/apt/sources.list.d/kubernetes.list
+        content: |
+          deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/ /
+
+    - name: Install kubelet, kubeadm, kubectl
+      apt:
+        name: [kubelet, kubeadm, kubectl]
+        update_cache: yes
+
+    - name: Hold Kubernetes packages
+      dpkg_selections:
+        name: "{{ item }}"
+        selection: hold
+      loop: [kubelet, kubeadm, kubectl]
+
+
+# ── Master only ──────────────────────────────────────────────────
+- name: Setup master node
+  hosts: master
+  become: yes
+  vars:
+    pod_network_cidr: "192.168.0.0/16"
+    kubernetes_version: "1.28"
+    calico_version: "v3.25.0"
+
+  tasks:
+
+    - name: Check if already initialized
+      stat:
+        path: /etc/kubernetes/admin.conf
+      register: kubeadm_done
+
+    - name: Init control plane
+      command: >
+        kubeadm init
+        --pod-network-cidr {{ pod_network_cidr }}
+        --kubernetes-version {{ kubernetes_version }}.0
+      when: not kubeadm_done.stat.exists
+
+    - name: Create .kube dir
+      file:
+        path: /home/ubuntu/.kube
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Copy kubeconfig
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/ubuntu/.kube/config
+        remote_src: yes
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Install Calico
+      become_user: ubuntu
+      command: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/calico.yaml
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config
+
+    - name: Get join command
+      command: kubeadm token create --print-join-command
+      register: join_command
+
+    - name: Save join command locally
+      local_action:
+        module: copy
+        content: "{{ join_command.stdout }}"
+        dest: /tmp/join-command.txt
+
+
+# ── Workers only ─────────────────────────────────────────────────
+- name: Join worker nodes
+  hosts: workers
+  become: yes
+
+  tasks:
+
+    - name: Check if already joined
+      stat:
+        path: /etc/kubernetes/kubelet.conf
+      register: already_joined
+
+    - name: Read join command
+      set_fact:
+        join_command: "{{ lookup('file', '/tmp/join-command.txt') }}"
+
+    - name: Join cluster
+      command: "{{ join_command }}"
+      when: not already_joined.stat.exists
