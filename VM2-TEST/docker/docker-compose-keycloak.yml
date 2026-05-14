@@ -1,0 +1,36 @@
+ersion: '3.8'
+
+services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.1
+    container_name: keycloak
+
+    restart: always
+
+    command: start-dev
+
+    environment:
+      KEYCLOAK_ADMIN: chaimae
+      KEYCLOAK_ADMIN_PASSWORD: chaimae1702
+
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak_db
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: chaimae1702
+
+      KC_HTTP_ENABLED: "true"
+
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+
+    ports:
+      - "8081:8080"
+
+    networks:
+      - app_network
+      
+networks:
+  app_network:
+    external: true
+

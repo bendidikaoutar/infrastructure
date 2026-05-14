@@ -1,0 +1,29 @@
+- name: Deploy Nexus on VM2
+  hosts: devsecops
+  become: yes
+
+  vars:
+    project_dir: /opt/nexus
+
+  tasks:
+
+    - name: Create project directory
+      file:
+        path: "{{ project_dir }}"
+        state: directory
+
+    - name: Copy docker-compose Nexus
+      copy:
+        src: docker/docker-compose-nexus.yml
+        dest: "{{ project_dir }}/docker-compose.yml"
+
+    - name: Ensure app network exists
+      docker_network:
+        name: app_network
+        state: present
+
+    - name: Deploy Nexus container
+      community.docker.docker_compose_v2:
+        project_src: "{{ project_dir }}"
+        state: present
+

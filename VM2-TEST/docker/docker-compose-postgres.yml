@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    restart: always
+
+    environment:
+      POSTGRES_USER: chaimae
+      POSTGRES_PASSWORD: chaimae1702
+      POSTGRES_DB: postgres   # DB par défaut
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+#      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    ports:
+      - "5432:5432"
+
+    networks:
+      - app_network
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
+    name: app_network
+    driver: bridge
+

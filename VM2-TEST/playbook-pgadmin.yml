@@ -1,0 +1,14 @@
+- name: Deploy pgAdmin
+  hosts: devsecops
+  become: yes
+
+  tasks:
+    - name: Copy docker-compose pgadmin
+      copy:
+        src: docker/docker-compose-pgadmin.yml
+        dest: /opt/devsecops/docker-compose-pgadmin.yml
+
+    - name: Start pgAdmin
+      command: docker compose -f /opt/devsecops/docker-compose-pgadmin.yml up -d
+
+

@@ -1,0 +1,20 @@
+- name: Deploy PostgreSQL
+  hosts: devsecops
+  become: yes
+
+  tasks:
+    - name: Create app directory on remote server
+      file:
+        path: /opt/devsecops
+        state: directory
+
+    - name: Copy docker-compose postgres
+      copy:
+        src: docker/docker-compose-postgres.yml
+        dest: /opt/devsecops/docker-compose-postgres.yml
+
+    - name: Start PostgreSQL
+      command: docker compose -f /opt/devsecops/docker-compose-postgres.yml up -d
+
+
+

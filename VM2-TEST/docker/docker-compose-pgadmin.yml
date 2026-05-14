@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: always
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: chaimae@local.com
+      PGADMIN_DEFAULT_PASSWORD: chaimae1702
+
+    ports:
+      - "5050:80"
+
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+    networks:
+      - app_network
+
+volumes:
+  pgadmin_data:
+
+networks:
+  app_network:
+    external: true

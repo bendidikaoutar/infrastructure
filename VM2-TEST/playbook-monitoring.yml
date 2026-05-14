@@ -1,0 +1,29 @@
+- name: Deploy Monitoring Stack
+  hosts: devsecops
+  become: true
+
+  vars:
+    app_dir: /opt/monitoring
+
+  tasks:
+
+    - name: Create monitoring directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Copy docker-compose file
+      copy:
+        src: docker/docker-compose-monitoring.yml
+        dest: "{{ app_dir }}/docker-compose.yml"
+
+    - name: Copy Prometheus config
+      copy:
+        src: monitoring/prometheus.yml
+        dest: "{{ app_dir }}/prometheus.yml"
+
+    - name: Start monitoring stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: present

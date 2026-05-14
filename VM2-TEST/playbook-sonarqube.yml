@@ -1,0 +1,34 @@
+- name: Deploy SonarQube (full setup)
+  hosts: devsecops
+  become: yes
+
+  vars:
+    remote_dir: /home/chaimae/sonarqube
+
+  tasks:
+
+    # ─────────────────────────────
+    # 1. Créer dossier distant
+    # ─────────────────────────────
+    - name: Create remote directory
+      file:
+        path: "{{ remote_dir }}"
+        state: directory
+        mode: '0755'
+
+    # ─────────────────────────────
+    # 2. Copier docker-compose
+    # ─────────────────────────────
+    - name: Copy docker-compose file
+      copy:
+        src: docker/docker-compose-sonarqube.yml
+        dest: "{{ remote_dir }}/docker-compose.yml"
+
+
+    # ─────────────────────────────
+    # 3. Lancer SonarQube
+    # ─────────────────────────────
+    - name: Start SonarQube container
+      command: docker compose up -d
+      args:
+        chdir: "{{ remote_dir }}"
