@@ -1,48 +1,48 @@
 resource "aws_vpc" "vpc_muestra" {
-    cidr_block = var.muestra_vpc_cidr
-    enable_dns_support = true 
-    enable_dns_hostnames = true
+  cidr_block           = var.muestra_vpc_cidr
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 
-    tags = {
-      Name = "muestra_vpc"
-    }
+  tags = {
+    Name = "muestra_vpc"
+  }
 }
 
 resource "aws_internet_gateway" "igw_muestra" {
-    vpc_id = aws_vpc.vpc_muestra.id
-    tags = {
-      Name = "muestra_vpc_igw"
-    }
+  vpc_id = aws_vpc.vpc_muestra.id
+  tags = {
+    Name = "muestra_vpc_igw"
+  }
 }
 
 data "aws_availability_zones" "azs" {
-    state = "available"
+  state = "available"
 }
 
 resource "aws_subnet" "muestra_subnet" {
-    availability_zone = element(data.aws_availability_zones.azs.names, 0)
-    vpc_id = aws_vpc.vpc_muestra.id
-    cidr_block = var.muestra_subnet_cidr
+  availability_zone = element(data.aws_availability_zones.azs.names, 0)
+  vpc_id            = aws_vpc.vpc_muestra.id
+  cidr_block        = var.muestra_subnet_cidr
 }
 
 resource "aws_route_table" "muestra_internet_route" {
-    vpc_id = aws_vpc.vpc_muestra.id
+  vpc_id = aws_vpc.vpc_muestra.id
 
-    route {
-        cidr_block = "0.0.0.0/0"
-        gateway_id = aws_internet_gateway.igw_muestra.id
-    }
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw_muestra.id
+  }
 
-    lifecycle {
-      ignore_changes = all
-    }
+  lifecycle {
+    ignore_changes = all
+  }
 
-    tags = {
-        Name = "muestra_route_table"
-    }
+  tags = {
+    Name = "muestra_route_table"
+  }
 }
 
 resource "aws_main_route_table_association" "muestra_set_rt_to_vpc" {
-    vpc_id = aws_vpc.vpc_muestra.id
-    route_table_id = aws_route_table.muestra_internet_route.id
+  vpc_id         = aws_vpc.vpc_muestra.id
+  route_table_id = aws_route_table.muestra_internet_route.id
 }
