@@ -1,9 +1,10 @@
 muestra_region        = "eu-west-3"
 muestra_vpc_cidr      = "10.0.0.0/16"
 muestra_subnet_cidr   = "10.0.1.0/24"
-muestra_bucket_rstate = "muestra_bucket"
-muestra_dynamodb      = "muestra_dynamodb"
 external_ip           = "<my_ip>"
-instance_type         = "t3.micro"
-workers_count         = 2
+tailscale_auth_key    = "<auth_key>"   
+cloudflare_tunnel_token = "<cldf_token>" 
+master_instance_type = "t3.small"
+worker_instance_type  = "t3.micro"
+workers_count         = 3
 project_name          = "muestra-ghailani"

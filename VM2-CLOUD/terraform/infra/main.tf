@@ -8,10 +8,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "muestra_bucket"
+    bucket         = "muestra-bucket"
     key            = "terraformstate/prod/state"
     region         = "eu-west-3"
-    dynamodb_table = "muestra_dynamodb"
+    use_lockfile   = true
     encrypt        = true
   }
 }
