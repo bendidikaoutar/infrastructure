@@ -7,7 +7,8 @@ curl -fsSL https://tailscale.com/install.sh | sh
 tailscale up \
  --authkey=${tailscale_auth_key} \
  --hostname=${hostname} \
- --accept-routes 
+ --accept-routes \
+ --force-reauth
 
 # Install cloudflared
 curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg

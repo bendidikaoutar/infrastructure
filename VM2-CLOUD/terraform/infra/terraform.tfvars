@@ -1,7 +1,6 @@
 muestra_region        = "eu-west-3"
 muestra_vpc_cidr      = "10.0.0.0/16"
 muestra_subnet_cidr   = "10.0.1.0/24"
-external_ip           = "<my_ip>"
 tailscale_auth_key    = "<auth_key>"   
 cloudflare_tunnel_token = "<cldf_token>" 
 master_instance_type = "t3.small"

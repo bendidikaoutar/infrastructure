@@ -14,12 +14,6 @@ variable "muestra_subnet_cidr" {
   description = "CIDR block of the first subnet"
 }
 
-variable "external_ip" {
-  type        = string
-  description = "Our external IP"
-  default     = "0.0.0.0/0" # Default value set to allow all IPs
-}
-
 variable "worker_instance_type" {
   type        = string
   description = "Instance type for kubernetes nodes and master"

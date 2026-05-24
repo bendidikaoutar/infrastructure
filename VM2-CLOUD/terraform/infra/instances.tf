@@ -10,7 +10,7 @@ resource "aws_instance" "k8_master" {
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.muestra_cluster_sg.id]
   subnet_id                   = aws_subnet.muestra_subnet.id
-  user_data                   = base64encode(templatefile("./scripts/startup_master.sh",  {
+  user_data                   = base64encode(templatefile("./startup_master.sh",  {
     tailscale_auth_key = var.tailscale_auth_key
     cloudflare_tunnel_token = var.cloudflare_tunnel_token
     hostname = "muestra-master"
@@ -32,10 +32,6 @@ resource "aws_instance" "k8_node" {
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.muestra_cluster_sg.id]
   subnet_id                   = aws_subnet.muestra_subnet.id
-  user_data                   = base64encode(templatefile("./scripts/startup_worker.sh",  {
-    tailscale_auth_key = var.tailscale_auth_key
-    hostname = "muestra-node-${count.index + 1}"
-  }))
   user_data_replace_on_change = true
   tags = {
     Name = join("-", ["muestra-node", count.index + 1])

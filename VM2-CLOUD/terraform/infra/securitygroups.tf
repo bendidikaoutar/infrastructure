@@ -20,11 +20,11 @@ resource "aws_security_group" "muestra_cluster_sg" {
   }
 
   ingress {
-    description = "Allow SSH via Tailscale"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [var.external_ip]
+    description = "SSH from master"
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [var.muestra_vpc_cidr]
   }
 
   ingress {

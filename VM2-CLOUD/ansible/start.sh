@@ -6,13 +6,26 @@ if [ -z "$1" ]; then
 fi
 
 INVENTORY_FILE="inventory.ini"
+TERRAFORM_DIR="../terraform/infra"
 
 MASTER=$(sudo tailscale status | grep "muestra-master");
 MASTER_HOSTNAME=$(echo "$MASTER" | awk '{print $2}');
 MASTER_IP=$(echo "$MASTER" | awk '{print $1}');
 
-mapfile -t WORKERS < <(
-  sudo tailscale status | grep "muestra-node-" | sort -k2
+mapfile -t WORKER_IPS < <(
+  cd "$TERRAFORM_DIR" &&
+  set -a
+  source .env
+  set +a
+  terraform output -json worker_private_ips | jq -r '.[]'
+)
+
+mapfile -t WORKER_NAMES < <(
+  cd "$TERRAFORM_DIR" && 
+  set -a
+  source .env
+  set +a
+  terraform output -json worker_names | jq -r '.[]'
 )
 
 {
@@ -23,16 +36,19 @@ echo "$MASTER_HOSTNAME ansible_host=$MASTER_IP ansible_user=ubuntu ansible_ssh_p
 echo
 echo "[workers]"
 
-for worker in "${WORKERS[@]}"; do
-  IP=$(echo "$worker" | awk '{print $1}')
-  HOSTNAME=$(echo "$worker" | awk '{print $2}')
+for i in "${!WORKER_IPS[@]}"; do
+  IP="${WORKER_IPS[$i]}"
+  HOSTNAME="${WORKER_NAMES[$i]}"
   
   echo "$HOSTNAME ansible_host=$IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa"
 done
 
 echo
-echo "[all:vars]"
-echo "ansible_ssh_common_args='-o StricthostKeyChecking=no'" 
+echo "[workers:vars]"
+echo "ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyJump=ubuntu@$MASTER_IP -o ForwardAgent=yes'" 
+echo
+echo "[master:vars]"
+echo "ansible_ssh_common_args='-o StrictHostKeyChecking=no'"
 
 } > "$INVENTORY_FILE"
 
