@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "muestra_tfstate" {
   bucket = var.muestra_bucket_tfstate
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_versioning" "muestra_tfstate_versionning" {
