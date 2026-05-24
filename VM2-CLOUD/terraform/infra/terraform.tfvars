@@ -1,9 +1,14 @@
 muestra_region        = "eu-west-3"
 muestra_vpc_cidr      = "10.0.0.0/16"
 muestra_subnet_cidr   = "10.0.1.0/24"
-tailscale_auth_key    = "<auth_key>"   
-cloudflare_tunnel_token = "<cldf_token>" 
 master_instance_type = "t3.small"
 worker_instance_type  = "t3.micro"
-workers_count         = 3
+workers_count         = 1
 project_name          = "muestra-ghailani"
+
+ 
+cloudflare_tunnel_token = "<cldf_token>" 
+cloudflare_account_id = "<cldf_id>"
+cloudflare_zone_id = "<cldf_zone>"
+cloudflare_tunnel_id = "<cldf_tunnel>"
+cloudflare_api_token = "<api_token>"

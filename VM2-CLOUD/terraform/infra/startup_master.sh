@@ -1,14 +1,9 @@
 #!/bin/bash
 exec > /var/log/startup.log 2>&1
 
-# Install tailscale
-curl -fsSL https://tailscale.com/install.sh | sh
-
-tailscale up \
- --authkey=${tailscale_auth_key} \
- --hostname=${hostname} \
- --accept-routes \
- --force-reauth
+apt-get update
+apt-get install -y openssh-server
+systemctl enable --now ssh
 
 # Install cloudflared
 curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg

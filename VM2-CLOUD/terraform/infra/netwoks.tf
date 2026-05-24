@@ -19,10 +19,13 @@ data "aws_availability_zones" "azs" {
   state = "available"
 }
 
+# Private subnet
 resource "aws_subnet" "muestra_subnet" {
   availability_zone = element(data.aws_availability_zones.azs.names, 0)
   vpc_id            = aws_vpc.vpc_muestra.id
   cidr_block        = var.muestra_subnet_cidr
+  map_public_ip_on_launch = false
+  tags = { Name = "muestra-private-subnet"}
 }
 
 resource "aws_route_table" "muestra_internet_route" {

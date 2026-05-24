@@ -1,0 +1,6 @@
+.env
+path
+.terraform
+*.tfstate
+*.tfstate.*
+cluster_hosts.json

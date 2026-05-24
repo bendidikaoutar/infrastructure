@@ -13,25 +13,9 @@ resource "aws_security_group" "muestra_cluster_sg" {
 
   ingress {
     description = "Internal cluster traffic"
-    from_port   = 1024
-    to_port     = 65535
-    protocol    = "tcp"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = [var.muestra_vpc_cidr]
-  }
-
-  ingress {
-    description = "SSH from master"
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    cidr_blocks = [var.muestra_vpc_cidr]
-  }
-
-  ingress {
-    description = "Tailscale"
-    from_port = 41641
-    to_port = 41641
-    protocol = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 }

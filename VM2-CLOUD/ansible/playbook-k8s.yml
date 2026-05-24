@@ -159,6 +159,7 @@
         module: copy
         content: "{{ join_command.stdout }}"
         dest: /tmp/join-command.txt
+      become: no
 
 
 # ── Workers only ─────────────────────────────────────────────────
