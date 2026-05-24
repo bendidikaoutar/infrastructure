@@ -14,7 +14,7 @@ if ! env | grep -q "^CLDF_"; then
     exit 1
 fi
 
-INVENTORY_FILE="inventory.ini"
+INVENTORY_FILE="inventory"
 TERRAFORM_DIR="../terraform/infra"
 
 cd "$TERRAFORM_DIR" || exit 1
