@@ -12,26 +12,26 @@ resource "aws_security_group" "muestra_cluster_sg" {
   }
 
   ingress {
-    description = "ICMP"
-    from_port   = -1
-    to_port     = -1
-    protocol    = "icmp"
-    cidr_blocks = [var.muestra_vpc_cidr]
-  }
-
-  ingress {
-    description = "TCP internal"
-    from_port   = 0
+    description = "Internal cluster traffic"
+    from_port   = 1024
     to_port     = 65535
     protocol    = "tcp"
     cidr_blocks = [var.muestra_vpc_cidr]
   }
 
   ingress {
-    description = "Allow SSH"
+    description = "Allow SSH via Tailscale"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = [var.external_ip]
+  }
+
+  ingress {
+    description = "Tailscale"
+    from_port = 41641
+    to_port = 41641
+    protocol = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
