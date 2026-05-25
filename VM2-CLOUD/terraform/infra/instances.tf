@@ -1,12 +1,6 @@
-resource "aws_key_pair" "ssh_key" {
-  key_name   = "muestra-key"
-  public_key = file("~/.ssh/id_rsa.pub")
-}
-
 resource "aws_instance" "k8_master" {
   ami                         = "ami-02ab616bef07ac291" # Ubuntu 20.04
   instance_type               = var.master_instance_type
-  key_name                    = aws_key_pair.ssh_key.key_name
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.muestra_cluster_sg.id]
   subnet_id                   = aws_subnet.muestra_subnet.id
@@ -27,7 +21,6 @@ resource "aws_instance" "k8_node" {
   count                       = var.workers_count
   ami                         = "ami-02ab616bef07ac291" # Ubuntu 20.04
   instance_type               = var.worker_instance_type
-  key_name                    = aws_key_pair.ssh_key.key_name
   associate_public_ip_address = true # It's better to use NAT GateWay but I don't have money for that
   vpc_security_group_ids      = [aws_security_group.muestra_cluster_sg.id]
   subnet_id                   = aws_subnet.muestra_subnet.id
