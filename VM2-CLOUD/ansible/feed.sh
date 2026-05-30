@@ -31,7 +31,7 @@ mapfile -t worker_names_array <<< "$WORKER_NAMES"
 {
 echo "[all:vars]"
 echo "ansible_user=ubuntu"
-echo "ansible_ssh_private_key_file=~/.ssh/id_rsa"
+echo "ansible_ssh_private_key_file=~/.ssh/muestra"
 echo "ansible_ssh_extra_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'"
 echo
 echo "[master]"

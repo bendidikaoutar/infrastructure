@@ -26,7 +26,7 @@ $MARKER_START
 Host master.muestra.qzz.io
   ProxyCommand cloudflared access ssh --hostname %h --id ${CLDF_CLIENT_ID} --secret ${CLDF_CLIENT_SECRET}
   User ubuntu
-  IdentityFile /dev/null
+  IdentityFile ~/.ssh/muestra
   StrictHostKeyChecking no
   UserKnownHostsFile /dev/null
 $MARKER_END

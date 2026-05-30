@@ -1,3 +1,8 @@
+resource "aws_key_pair" "muestra" {
+  key_name = "muestra-key"
+  public_key = file("~/.ssh/muestra.pub")
+}
+
 resource "aws_instance" "k8_master" {
   ami                         = "ami-02ab616bef07ac291" # Ubuntu 20.04
   instance_type               = var.master_instance_type
@@ -9,6 +14,7 @@ resource "aws_instance" "k8_master" {
     hostname = "muestra-master"
   }))
   user_data_replace_on_change = true
+  key_name = aws_key_pair.muestra.key_name
 
   tags = {
     Name = "muestra-master"
@@ -24,6 +30,12 @@ resource "aws_instance" "k8_node" {
   associate_public_ip_address = true # It's better to use NAT GateWay but I don't have money for that
   vpc_security_group_ids      = [aws_security_group.muestra_cluster_sg.id]
   subnet_id                   = aws_subnet.muestra_subnet.id
+  key_name = aws_key_pair.muestra.key_name
+
+  root_block_device {
+    volume_size = 20
+  }
+
   tags = {
     Name = join("-", ["muestra-node", count.index + 1])
   }
