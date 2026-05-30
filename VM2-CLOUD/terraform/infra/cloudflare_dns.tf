@@ -12,6 +12,24 @@ resource "cloudflare_record" "master" {
   allow_overwrite = true
 }
 
+resource "cloudflare_record" "staging" {
+  zone_id         = var.cloudflare_zone_id
+  name            = "staging"
+  content         = "${data.cloudflare_zero_trust_tunnel_cloudflared.muestra_tunnel.id}.cfargotunnel.com"
+  type            = "CNAME"
+  proxied         = false
+  allow_overwrite = true
+}
+
+resource "cloudflare_record" "dev" {
+  zone_id         = var.cloudflare_zone_id
+  name            = "dev"
+  content         = "${data.cloudflare_zero_trust_tunnel_cloudflared.muestra_tunnel.id}.cfargotunnel.com"
+  type            = "CNAME"
+  proxied         = false
+  allow_overwrite = true
+}
+
 resource "cloudflare_record" "root" {
   zone_id         = var.cloudflare_zone_id
   name            = "@"
