@@ -34,6 +34,8 @@ EOF
 
 chmod 600 "$SSH_CONFIG"
 
+ssh master.muestra.qzz.io "echo '$(cat ~/.ssh/muestra_ci.pub)' >> ~/.ssh/authorized_keys"
+
 echo "SSH config updated"
 echo ""
 echo "Now you can connect with:"
