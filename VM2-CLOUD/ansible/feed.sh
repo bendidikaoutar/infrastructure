@@ -48,7 +48,7 @@ for i in "${!worker_ips_array[@]}"; do
 done
 echo
 echo "[workers:vars]"
-echo "ansible_ssh_common_args=-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ForwardAgent=yes -o ProxyJump='ubuntu@master.muestra.qzz.io'"
+echo "ansible_ssh_common_args=-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ForwardAgent=yes -o ProxyCommand='ssh -W %h:%p ubuntu@master.muestra.qzz.io'"
 } > "$INVENTORY_FILE"
 
 echo "Generated $INVENTORY_FILE"

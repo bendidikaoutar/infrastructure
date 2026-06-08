@@ -9,6 +9,10 @@ if ! env | grep -q "^CLDF_"; then
     exit 1
 fi
 
+# Start SSH agent and add the private key
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/muestra
+
 CLDF_CLIENT_ID=$(env | grep CLDF_CLIENT_ID | cut -f 2 -d '=');
 CLDF_CLIENT_SECRET=$(env | grep CLDF_CLIENT_SECRET | cut -f 2 -d '=');
 
