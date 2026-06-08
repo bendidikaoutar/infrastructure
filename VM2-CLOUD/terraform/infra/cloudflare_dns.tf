@@ -17,7 +17,7 @@ resource "cloudflare_record" "staging" {
   name            = "staging"
   content         = "${data.cloudflare_zero_trust_tunnel_cloudflared.muestra_tunnel.id}.cfargotunnel.com"
   type            = "CNAME"
-  proxied         = false
+  proxied         = true
   allow_overwrite = true
 }
 
@@ -26,7 +26,7 @@ resource "cloudflare_record" "dev" {
   name            = "dev"
   content         = "${data.cloudflare_zero_trust_tunnel_cloudflared.muestra_tunnel.id}.cfargotunnel.com"
   type            = "CNAME"
-  proxied         = false
+  proxied         = true
   allow_overwrite = true
 }
 
