@@ -18,3 +18,5 @@ DB_PASSWORD=$(env | grep DB_PASSWORD | cut -f 2 -d '=');
 
 
 terraform output;
+terraform output -raw s3_access_key_id;
+terraform output -raw s3_secret_access_key;

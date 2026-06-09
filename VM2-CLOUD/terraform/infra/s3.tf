@@ -21,10 +21,19 @@ resource "aws_s3_bucket_versioning" "muestra_uploads" {
 # IAM user dédié pour le backend
 resource "aws_iam_user" "muestra_backend" {
   name = "muestra-backend-s3"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_iam_access_key" "muestra_backend" {
   user = aws_iam_user.muestra_backend.name
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = all
+  }
 }
 
 resource "aws_iam_user_policy" "muestra_backend_s3" {
