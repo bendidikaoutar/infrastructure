@@ -1,0 +1,83 @@
+---
+- name: Install Metrics Server
+  hosts: master
+  become: yes
+
+  tasks:
+
+    - name: Check if metrics-server already installed
+      command: kubectl get deployment metrics-server -n kube-system
+      register: metrics_check
+      failed_when: false
+      changed_when: false
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config
+
+    - name: Apply metrics-server manifest
+      become_user: ubuntu
+      command: >
+        kubectl apply -f 
+        https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config
+      when: metrics_check.rc != 0
+
+    - name: Wait 10 seconds
+      pause:
+        seconds: 10
+
+    - name: Patch metrics-server to skip TLS verification
+      become_user: ubuntu
+      shell: |
+        kubectl patch deployment metrics-server -n kube-system --type='json' \
+        -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--kubelet-insecure-tls"}]'
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config
+      ignore_errors: yes
+
+    - name: Wait 30 seconds for metrics-server to restart
+      pause:
+        seconds: 30
+
+    - name: Check metrics-server pod status
+      become_user: ubuntu
+      command: kubectl get pods -n kube-system -l k8s-app=metrics-server
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config
+      register: metrics_pods
+
+    - name: Display metrics-server pods
+      debug:
+        msg: "{{ metrics_pods.stdout }}"
+
+    - name: Wait for metrics-server to be ready
+      become_user: ubuntu
+      command: >
+        kubectl wait --for=condition=available --timeout=60s 
+        deployment/metrics-server -n kube-system
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config
+      ignore_errors: yes
+
+    - name: Final metrics-server status
+      become_user: ubuntu
+      command: kubectl get deployment metrics-server -n kube-system
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config
+      register: metrics_result
+
+    - name: Display final status
+      debug:
+        msg: "{{ metrics_result.stdout }}"
+
+    - name: Verify metrics-server is working
+      become_user: ubuntu
+      command: kubectl get --raw /apis/metrics.k8s.io/v1beta1/nodes
+      environment:
+        KUBECONFIG: /home/ubuntu/.kube/config
+      register: metrics_verify
+      ignore_errors: yes
+
+    - name: Metrics API status
+      debug:
+        msg: "Metrics API: {{ 'WORKING' if metrics_verify.rc == 0 else 'NOT WORKING' }}"
