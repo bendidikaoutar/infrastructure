@@ -18,6 +18,9 @@ DB_PASSWORD=$(env | grep DB_PASSWORD | cut -f 2 -d '=');
 
 
 terraform destroy \
+    -target=aws_instance.k8_master \
+    -target="aws_instance.k8_node[0]" \
+    -target="aws_instance.k8_node[1]" \
     -var="cloudflare_tunnel_token=${CLDF_TUNNEL_TOKEN}" \
     -var="cloudflare_account_id=${CLDF_ACCOUNT_ID}" \
     -var="cloudflare_zone_id=${CLDF_ZONE_ID}" \
