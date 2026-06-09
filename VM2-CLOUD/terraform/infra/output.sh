@@ -17,11 +17,4 @@ CLDF_API_TOKEN=$(env | grep CLDF_API_TOKEN | cut -f 2 -d '=');
 DB_PASSWORD=$(env | grep DB_PASSWORD | cut -f 2 -d '=');
 
 
-terraform destroy \
-    -var="cloudflare_tunnel_token=${CLDF_TUNNEL_TOKEN}" \
-    -var="cloudflare_account_id=${CLDF_ACCOUNT_ID}" \
-    -var="cloudflare_zone_id=${CLDF_ZONE_ID}" \
-    -var="cloudflare_tunnel_id=${CLDF_TUNNEL_ID}" \
-    -var="cloudflare_api_token=${CLDF_API_TOKEN}" \
-    -var="db_password=${DB_PASSWORD}" \
-    -auto-approve;
+terraform output;
