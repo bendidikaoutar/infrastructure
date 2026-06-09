@@ -38,21 +38,3 @@ resource "cloudflare_record" "root" {
   proxied         = true
   allow_overwrite = true
 }
-
-resource "cloudflare_record" "prometheus" {
-  zone_id         = var.cloudflare_zone_id
-  name            = "prometheus"
-  content         = "${data.cloudflare_zero_trust_tunnel_cloudflared.muestra_tunnel.id}.cfargotunnel.com"
-  type            = "CNAME"
-  proxied         = true
-  allow_overwrite = true
-}
-
-resource "cloudflare_record" "grafana" {
-  zone_id         = var.cloudflare_zone_id
-  name            = "grafana"
-  content         = "${data.cloudflare_zero_trust_tunnel_cloudflared.muestra_tunnel.id}.cfargotunnel.com"
-  type            = "CNAME"
-  proxied         = true
-  allow_overwrite = true
-}
