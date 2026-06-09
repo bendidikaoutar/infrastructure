@@ -1,3 +1,4 @@
+# Main vpc
 resource "aws_vpc" "vpc_muestra" {
   cidr_block           = var.muestra_vpc_cidr
   enable_dns_support   = true
@@ -48,4 +49,21 @@ resource "aws_route_table" "muestra_internet_route" {
 resource "aws_main_route_table_association" "muestra_set_rt_to_vpc" {
   vpc_id         = aws_vpc.vpc_muestra.id
   route_table_id = aws_route_table.muestra_internet_route.id
+}
+
+# RDS subnet
+resource "aws_subnet" "muestra_rds_subnet" {
+  availability_zone = element(data.aws_availability_zones.azs.names, 1)
+  vpc_id = aws_vpc.vpc_muestra.id
+  cidr_block = var.muestra_rds_subnet_cidr
+  tags = { Name = "muestra-rds-subnet"}
+}
+
+resource "aws_db_subnet_group" "muestra_rds_subnet_group" {
+  name = "muestra-rds-subnet-grup"
+  subnet_ids = [
+    aws_subnet.muestra_subnet.id,
+    aws_subnet.muestra_rds_subnet.id,
+  ]
+  tags = { Name = "muestra-rds-subnet-group" }
 }

@@ -17,3 +17,22 @@ output "workers_private_ips" {
 output "workers_public_ips" {
   value = aws_instance.k8_node[*].public_ip
 }
+
+output "rds_prod_endpoint" {
+  value = aws_db_instance.muestra_prod.endpoint
+  description = "A mettre dans le secret GitHub DB_HOST"
+}
+
+output "s3_bucket_name" {
+  value = aws_s3_bucket.muestra_uploads.bucket
+}
+
+output "s3_access_key_id" {
+  value     = aws_iam_access_key.muestra_backend.id
+  sensitive = true
+}
+
+output "s3_secret_access_key" {
+  value     = aws_iam_access_key.muestra_backend.secret
+  sensitive = true
+}

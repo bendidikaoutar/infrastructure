@@ -66,3 +66,23 @@ variable "cloudflare_api_token" {
   type        = string
   sensitive   = true
 }
+
+variable "muestra_rds_subnet_cidr" {
+  description = "CIDR pour le subnet secondaire RDS"
+  type = string
+}
+
+variable "db_name" {
+  type = string
+  sensitive = true
+}
+
+variable "db_user" {
+  type = string
+  sensitive = true
+}
+
+variable "db_password" {
+  type = string
+  sensitive = true
+}
