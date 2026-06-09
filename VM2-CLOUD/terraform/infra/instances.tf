@@ -37,7 +37,7 @@ resource "aws_instance" "k8_node" {
   }
 
   tags = {
-    Name = join("-", ["muestra-node", count.index + 1])
+    Name = join("-", ["muestra-node", count.index])
   }
 
   depends_on = [aws_main_route_table_association.muestra_set_rt_to_vpc]
