@@ -9,9 +9,12 @@ if ! env | grep -q "^CLDF_"; then
     exit 1
 fi
 
-# Start SSH agent and add the private key
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/muestra
+# Start SSH agent and add the key if not already loaded
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    eval "$(ssh-agent -s)" > /dev/null
+fi
+# Add key (will prompt for passphrase once per shell session)
+ssh-add ~/.ssh/muestra 2>/dev/null || true
 
 CLDF_CLIENT_ID=$(env | grep CLDF_CLIENT_ID | cut -f 2 -d '=');
 CLDF_CLIENT_SECRET=$(env | grep CLDF_CLIENT_SECRET | cut -f 2 -d '=');
@@ -45,5 +48,3 @@ echo ""
 echo "Now you can connect with:"
 echo "  ssh master.muestra.qzz.io"
 echo ""
-echo "Or test with:"
-echo "  ssh master.muestra.qzz.io 'kubectl get nodes'"

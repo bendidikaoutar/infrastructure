@@ -14,6 +14,13 @@ if ! env | grep -q "^CLDF_"; then
     exit 1
 fi
 
+# Start SSH agent and add the key if not already loaded
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    eval "$(ssh-agent -s)" > /dev/null
+fi
+# Add key (will prompt for passphrase once per shell session)
+ssh-add ~/.ssh/muestra 2>/dev/null || true
+
 INVENTORY_FILE="inventory.ini"
 TERRAFORM_DIR="../terraform/infra"
 
